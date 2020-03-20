@@ -26,54 +26,59 @@ library(rvest)
 library(xml2)
 library(stringr)
 library(dplyr)
+
 library(DT)
+library("tibble")
+library(data.table)
+library(plyr)
 ```
 
-```{r}
-  scraper_func <- function(url) {
-  job_title <- page %>% 
-  rvest::html_nodes(".jobtitle") %>%
-  rvest::html_attr("title")
-  location <- page %>%
-  rvest::html_nodes(".location") %>%
-  rvest::html_text()
-  company_name <- page %>% rvest::html_nodes(".company") %>%
-  rvest::html_text() %>%
-  stringi::stri_trim_both()  
-  links <- page %>% 
-  rvest::html_nodes('[data-tn-element="jobTitle"]') %>%
-  rvest::html_attr("href")
-  job_desc <- c()
-  for (link in links) {
-    url <- paste0("https://www.indeed.com/", link)
-    page <- xml2::read_html(url) %>% html_node("#jobDescriptionText") %>%
-      html_text() %>%
-        stringi::stri_trim_both()
-    job_desc <- c(job_desc, page)
-  }
-  df <- data.frame(job_title, location, company_name, job_desc)
-  return(df)
-  }
-pages <- seq(from = 0, to = 990, by = 10 )
-ds_df <- data.frame()
-url <- "https://www.indeed.com/jobs?q=data+scientist&l=USA"
-page <- xml2::read_html(url)
-for (i in pages) {
-  if (i == 0) {
-    page <- xml2::read_html(url)
-    Sys.sleep(3)
-    df <- scraper_func(page)
-    ds_df <- rbind(ds_df, df)
-  } else {
-    url_next <- paste0(url, "&start=", i)
-    page <- xml2::read_html(url)
-    Sys.sleep(3)
-    df <- scraper_func(page)
-    ds_df <- rbind(ds_df, df)
-  }
-  }
-ds_df
-```
+
+<!-- ```{r} -->
+<!--   scraper_func <- function(url) { -->
+<!--   job_title <- page %>%  -->
+<!--   rvest::html_nodes(".jobtitle") %>% -->
+<!--   rvest::html_attr("title") -->
+<!--   location <- page %>% -->
+<!--   rvest::html_nodes(".location") %>% -->
+<!--   rvest::html_text() -->
+<!--   company_name <- page %>% rvest::html_nodes(".company") %>% -->
+<!--   rvest::html_text() %>% -->
+<!--   stringi::stri_trim_both()   -->
+<!--   links <- page %>%  -->
+<!--   rvest::html_nodes('[data-tn-element="jobTitle"]') %>% -->
+<!--   rvest::html_attr("href") -->
+<!--   job_desc <- c() -->
+<!--   for (link in links) { -->
+<!--     url <- paste0("https://www.indeed.com/", link) -->
+<!--     page <- xml2::read_html(url) %>% html_node("#jobDescriptionText") %>% -->
+<!--       html_text() %>% -->
+<!--         stringi::stri_trim_both() -->
+<!--     job_desc <- c(job_desc, page) -->
+<!--   } -->
+<!--   df <- data.frame(job_title, location, company_name, job_desc) -->
+<!--   return(df) -->
+<!--   } -->
+<!-- pages <- seq(from = 0, to = 990, by = 10 ) -->
+<!-- ds_df <- data.frame() -->
+<!-- url <- "https://www.indeed.com/jobs?q=data+scientist&l=USA" -->
+<!-- page <- xml2::read_html(url) -->
+<!-- for (i in pages) { -->
+<!--   if (i == 0) { -->
+<!--     page <- xml2::read_html(url) -->
+<!--     Sys.sleep(3) -->
+<!--     df <- scraper_func(page) -->
+<!--     ds_df <- rbind(ds_df, df) -->
+<!--   } else { -->
+<!--     url_next <- paste0(url, "&start=", i) -->
+<!--     page <- xml2::read_html(url) -->
+<!--     Sys.sleep(3) -->
+<!--     df <- scraper_func(page) -->
+<!--     ds_df <- rbind(ds_df, df) -->
+<!--   } -->
+<!--   } -->
+<!-- ds_df -->
+<!-- ``` -->
 
 
 ```{r}
@@ -316,6 +321,8 @@ data %>% select  (one_of(c("soft_skills_2", "soft_skill_groupings_2"))) %>% head
 
 ```
 
+
+#### Analysis 1a -- Top Data Science Soft Skills
 ```{r Analysis-1a}
 library(ggplot2)
 library(scales) 
@@ -392,7 +399,7 @@ soft_skills_count_df_final
   coord_flip()
 ```
 
-
+#### Analysis 1a -- Top Data Science Hard Skills
 
 ```{r Analysis-1a-Hard-Skills-Section}
 
@@ -423,6 +430,53 @@ hard_skills_count_df_final
   coord_flip()
 ```
 
+
+#### Analysis 1b -- Top Data Science Soft Skills
+
+```{r Analysis-1b-Soft-Skills-by-geo-location}
+str(data)
+head(data[,c("location","state" )] )
+
+#  paste(data$location, sep = " ", data$state)
+data1 <- data
+data1$city_state <- paste(data$location, sep = " ", data$state) 
+# %>%group_by( paste(location, sep = " ", state)) 
+
+data2 <- data1 %>% select (city_state, hard_skill_groupings_2, soft_skill_groupings_2) %>% group_by (city_state) 
+# data1 #%>% select(city_state, hard_skill_groupings_2) %>% 
+#   table(strsplit(paste(stringi::stri_remove_empty(data1$hard_skill_groupings_2, na_empty = T), collapse = ','), ",")) %>% group_by( paste(location, sep = " ", state)) 
+
+data2 %>%  summarize(soft_skill_groupings_2 = n())
+
+data2 %>% count(table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) , id) %>% {table(.$vall)}
+
+table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")
+      
+      
+      
+count(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), data2$city_state)
+
+data2 %>%> count()
+str(table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) )
+table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), responseName = counts) 
+
+
+
+data.table1 <- table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) 
+df1 <- as.data.frame(data.table1)
+str(df1)
+df1
+setDT(df1)[, .(Var1, Freq)][, .N , Freq]
+
+setDT(data2)[, .(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state)]
+data.table2<- setDT(data2)[, .(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state)]
+count(data.table2, )
+
+str(data.table2)
+
+plyr::count(data2, strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state )
+summarise_at(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), )
+```
 
 
 
