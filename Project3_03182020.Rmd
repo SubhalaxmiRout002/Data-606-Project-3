@@ -26,22 +26,34 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library(tidyverse)
+# library(plyr)
+# library(tidyverse)
+# library(rvest)
+# library(xml2)
+# library(stringr)
+# 
+# library(dplyr)
+# library(tidyr)
+# library(DT)
+# library("tibble")
+# library(data.table)
+# 
+# library(rlist)
+# library(pipeR)
+# library(tm)
+# library(broom)
+# library(tidytext)
+
 library(rvest)
-library(xml2)
-library(stringr)
 library(plyr)
 library(dplyr)
+library(stringr)
 library(tidyr)
-library(DT)
-library("tibble")
-library(data.table)
-
-library(rlist)
-library(pipeR)
+library(ggplot2)
 library(tm)
-library(broom)
 library(tidytext)
+
+
 
 
 ```
@@ -96,7 +108,8 @@ library(tidytext)
 
 ```{r}
 #data cleaning
-data <- readr::read_csv("https://raw.githubusercontent.com/christianthieme/MSDS-DATA607/master/indeed_scrape.csv")
+# data <- readr::read_csv("https://raw.githubusercontent.com/christianthieme/MSDS-DATA607/master/indeed_scrape.csv")
+data <- read.csv("https://raw.githubusercontent.com/SubhalaxmiRout002/Data-607-Project-3/master/data.csv", stringsAsFactors = FALSE)
 
 #remove duplicate
 data <- unique(data)
@@ -604,7 +617,7 @@ df_city %>%
                         )
         ) %>%
   group_by(document) %>%
-  top_n(3, wt = count) %>%
+  top_n(6, wt = count) %>%
   ungroup() %>%
   ggplot(aes(word, count, fill = document)) +
   geom_bar(stat = "identity", alpha = 0.8, show.legend = FALSE) +
@@ -612,6 +625,8 @@ df_city %>%
        x = "Soft Skills Groupings", y = "TF-IDF") +
   facet_wrap(~city, ncol = 2, scales = "free_y") +
   coord_flip()
+
+
 
 ```
 
