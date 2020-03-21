@@ -164,6 +164,7 @@ head(data)
 
 
 
+
 ```{r hardskills}
 # created bucket for hard skills
 tags_technicalskills <- c("analytic solutions","machine learning","predictive modeling","database systems","clinical decision engines", "algorithms", "NLP/ML", "SQL",  "MongoDB","DynamoDB", "R, ","Python","dplyr","GGPlot", "Pandas","OLS","MLE","Machine Learning",  "Decision Tree/Random Forest","AI" , "Visualization","A/B tests set-up","Reporting","analysis",  "data visualizations","numpy", "scipy","scikit-learn", "tensorflow","pytorch" , "keras","genism", "vowpal wabbit","Heap.io","Google Analytics","Big Data","Business Analytics","Oracle","Relational Database Management System (RDMS)","Statistical Programming Language","Regression","Decision Trees","K-Means","Tableau","looker","R Programming" ,"Microsoft Office" , "SPSS","No-SQL", "Cassandra","Hadoop", "Pig","Hive", "HPCC Systems","Javascript" , "Java programming","PowerBI","Linux","TensorFlow", "Keras","Shiny","Artificial Intelligence","NLP", "Tesseract","Jenkins CI/CD", "Azure","logistic regression","k-means clustering","decision forests", "JavaScript","Cloud data", "MATLAB","Excel", "Jupyter","Gurobi","agile", "Git","Github" ,"SNR signals", "Qlikview","Business Intelligence", "supply chain","D3", "big data",'business sense','C Programming','group API', 'Get Requests', 'Push Requests', 'Update Requests','AWS', 'Sagemaker','Power BI','Cognos', 'Business Objects','Amplitude','Mixpanel','Salesforce', 'Qlik','Microstrategy', 'java, ')
@@ -225,13 +226,17 @@ head(data,30)
 
 ```{r skillsetgrouping-only-run-once}
 # replace "r," to r and c, to c and java, to java
-data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "r, ", replacement = "r", fixed = TRUE))
-data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "c, ", replacement = "c", fixed = TRUE))
+data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "r, ", replacement = "r programming", fixed = TRUE))
+data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = " r/", replacement = "r programming", fixed = TRUE))
+data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "/r ", replacement = "r programming", fixed = TRUE))
+data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "c, ", replacement = "c programming", fixed = TRUE))
 data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "java, ", replacement = "java", fixed = TRUE))
-data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "r programming", replacement = "r", fixed = TRUE))
-data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "c programming", replacement = "c", fixed = TRUE))
+# data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "r programming", replacement = "r", fixed = TRUE))
+# data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "c programming", replacement = "c", fixed = TRUE))
 data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "java programming", replacement = "java", fixed = TRUE))
 data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "artificial intelligence", replacement = "ai", fixed = TRUE))
+data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "qlik|qlikview", replacement = "qlikview"))
+data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "power bi", replacement = "powerbi", fixed = TRUE))
 data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "nlp|nlp/ml", replacement = "nlp/ml"))
 data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "k-means clustering|k-means", replacement = "k-means clustering"))
 data$hard_skills_2 <- as.character(lapply(data$hard_skills_2, gsub, pattern = "decision tree/random forest", replacement = "decision trees", fixed = TRUE))
@@ -435,10 +440,14 @@ hard_skills_count_df_final <- count_df1 %>% arrange(desc(Freq)) %>% mutate(Frequ
 hard_skills_count_df_final
 
 
+# filtering out exception cases 
+hard_skills_count_df_final1 <- hard_skills_count_df_final %>% filter (!(Var1  == "r" | Var1 == "snr signals" | Var1 == "AI/ML&Algorithmsscript" | Var1 == "Visualizationss" | Var1 == "Visualizationsview"))
+
+
 ```
 
 ```{r fig.width=13, fig.height= 4}
-  ggplot(data = hard_skills_count_df_final) +
+  ggplot(data = hard_skills_count_df_final1) +
   aes(x = reorder(Var1, Frequency_Percent), y = Frequency_Percent) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = paste0(Frequency_Percent, "%")), hjust = -.15) +
