@@ -22,6 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("pipeR")
 #install.packages("tm")
 #install.packages("tidyr")
+#install.packages("tidytext")
 ```
 
 ```{r}
@@ -40,7 +41,7 @@ library(rlist)
 library(pipeR)
 library(tm)
 library(broom)
-
+library(tidytext)
 
 
 ```
@@ -446,69 +447,69 @@ hard_skills_count_df_final
 #### Analysis 1b -- Top Data Science Soft Skills by location
 
 ```{r Analysis-1b-Soft-Skills-by-geo-location}
-str(data)
-head(data[,c("location","state" )] )
-
-#  paste(data$location, sep = " ", data$state)
-data1 <- data
-data1$city_state <- paste(data$location, sep = " ", data$state) 
-# %>%group_by( paste(location, sep = " ", state)) 
-
-data2 <- data1 %>% select (city_state, hard_skill_groupings_2, soft_skill_groupings_2) %>% group_by (city_state) 
-# data1 #%>% select(city_state, hard_skill_groupings_2) %>% 
-#   table(strsplit(paste(stringi::stri_remove_empty(data1$hard_skill_groupings_2, na_empty = T), collapse = ','), ",")) %>% group_by( paste(location, sep = " ", state)) 
-
-data2 %>%  summarize(soft_skill_groupings_2 = n())
-
-data2 %>% count(table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) , id) %>% {table(.$vall)}
-
-table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")
-      
-      
-      
-count(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), data2$city_state)
-
-data2 %>%> count()
-str(table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) )
-table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), responseName = counts) 
-
-
-
-data.table1 <- table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) 
-df1 <- as.data.frame(data.table1)
-str(df1)
-df1
-setDT(df1)[, .(Var1, Freq)][, .N , Freq]
-
-setDT(data2)[, .(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state)]
-data.table2<- setDT(data2)[, .(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state)]
-count(data.table2, )
-
-str(data.table2)
-
-plyr::count(data2, strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state )
-summarise_at(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), )
-
-
-data2 %>% group_by("city_state") %>% count(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','))
-
-data2 %>% group_by("city_state") %>% mutate( counts=n(), lists=list(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) )
-
-# method 1 using dplyr
-data2 %>% group_by(city_state) %>% count(soft_skill_groupings_2, city_state) %>% {table(.$soft_skill_groupings_2)}
-
-# method 2 using count functions
-
- count(data2, soft_skill_groupings_2, city_state ) %>% count(soft_skill_groupings_2)
- 
- # method 3 using group_by and count
- data2 %>% group_by(city_state) %>% count(soft_skill_groupings_2) %>% group_by(city_state, soft_skill_groupings_2) %>% count()
- 
- 
- data2 %>% group_by(city_state) %>% as.data.frame( table(strsplit(paste(stringi::stri_remove_empty(soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) )%>%  head (1) group_by(city_state, soft_skill_groupings_2) %>% count()
- 
- 
- data2 %>% group_by(city_state) %>%  mutate ( lists=as.character(count(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ',')))) %>% group_by(city_state, soft_skill_groupings_2) %>% count()
+# str(data)
+# head(data[,c("location","state" )] )
+# 
+# #  paste(data$location, sep = " ", data$state)
+# data1 <- data
+# data1$city_state <- paste(data$location, sep = " ", data$state) 
+# # %>%group_by( paste(location, sep = " ", state)) 
+# 
+# data2 <- data1 %>% select (city_state, hard_skill_groupings_2, soft_skill_groupings_2) %>% group_by (city_state) 
+# # data1 #%>% select(city_state, hard_skill_groupings_2) %>% 
+# #   table(strsplit(paste(stringi::stri_remove_empty(data1$hard_skill_groupings_2, na_empty = T), collapse = ','), ",")) %>% group_by( paste(location, sep = " ", state)) 
+# 
+# data2 %>%  summarize(soft_skill_groupings_2 = n())
+# 
+# data2 %>% count(table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) , id) %>% {table(.$vall)}
+# 
+# table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")
+#       
+#       
+#       
+# count(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), data2$city_state)
+# 
+# data2 %>%> count()
+# str(table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) )
+# table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), responseName = counts) 
+# 
+# 
+# 
+# data.table1 <- table(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) 
+# df1 <- as.data.frame(data.table1)
+# str(df1)
+# df1
+# setDT(df1)[, .(Var1, Freq)][, .N , Freq]
+# 
+# setDT(data2)[, .(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state)]
+# data.table2<- setDT(data2)[, .(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state)]
+# count(data.table2, )
+# 
+# str(data.table2)
+# 
+# plyr::count(data2, strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state )
+# summarise_at(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), )
+# 
+# 
+# data2 %>% group_by("city_state") %>% count(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','))
+# 
+# data2 %>% group_by("city_state") %>% mutate( counts=n(), lists=list(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) )
+# 
+# # method 1 using dplyr
+# data2 %>% group_by(city_state) %>% count(soft_skill_groupings_2, city_state) %>% {table(.$soft_skill_groupings_2)}
+# 
+# # method 2 using count functions
+# 
+#  count(data2, soft_skill_groupings_2, city_state ) %>% count(soft_skill_groupings_2)
+#  
+#  # method 3 using group_by and count
+#  data2 %>% group_by(city_state) %>% count(soft_skill_groupings_2) %>% group_by(city_state, soft_skill_groupings_2) %>% count()
+#  
+#  
+#  data2 %>% group_by(city_state) %>% as.data.frame( table(strsplit(paste(stringi::stri_remove_empty(soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) )%>%  head (1) group_by(city_state, soft_skill_groupings_2) %>% count()
+#  
+#  
+#  data2 %>% group_by(city_state) %>%  mutate ( lists=as.character(count(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ',')))) %>% group_by(city_state, soft_skill_groupings_2) %>% count()
 
 as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq))
 # 1             New York NY   59
@@ -528,29 +529,32 @@ as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq))
 ```{r new-approach}
 # Trying to divide the corpus by cities
 
-ny <- data2[data2$city_state == "New York NY", 1]
-la <- data2[data2$city_state == "Los Angeles CA", 1] 
-sf <- data2[data2$city_state == "San Francisco CA", 1] 
-chi <- data2[data2$city_state == "Chicago IL", 1] 
-sd <- data2[data2$city_state == "San Diego CA", 1] 
-bos <- data2[data2$city_state == "Boston MA", 1] 
-wdc <- data2[data2$city_state == "Washington DC", 1] 
-sc <- data2[data2$city_state == "Santa Clara CA", 1]
-den <- data2[data2$city_state == "Denver CO", 1 ] 
-sea <- data2[data2$city_state == "Seattle WA", 1]
+ny <- data2[data2$city_state == "New York NY", 3]
+la <- data2[data2$city_state == "Los Angeles CA", 3] 
+sf <- data2[data2$city_state == "San Francisco CA", 3] 
+chi <- data2[data2$city_state == "Chicago IL", 3] 
+sd <- data2[data2$city_state == "San Diego CA", 3] 
+bos <- data2[data2$city_state == "Boston MA", 3] 
+wdc <- data2[data2$city_state == "Washington DC", 3] 
+sc <- data2[data2$city_state == "Santa Clara CA", 3]
+den <- data2[data2$city_state == "Denver CO", 3 ] 
+sea <- data2[data2$city_state == "Seattle WA", 3]
 
 cities <- c(ny, la, sf, chi, sd, bos, wdc, sc, den, sea)
 
 corpus.city <- VCorpus(VectorSource(cities))
 #list("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")
-tdm.city <- TermDocumentMatrix(corpus.city, control = control_list)
+tdm.city <- DocumentTermMatrix(corpus.city, control = control_list)
 
 
 # Make city dataframe
 
 
 df_city <- tidy(tdm.city)
-data2$soft_skill_groupings_3 <- mapvalues(data2.city,
+
+df_city
+
+df_city$document <- mapvalues(df_city$document,
                                           from = 1:10,
                                           to = c("NY", "LA", "SF",
                                                  "CHI", "SD", "BOS",
