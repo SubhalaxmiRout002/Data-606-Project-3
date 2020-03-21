@@ -18,6 +18,10 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("stringr")
 #install.packages("dplyr")
 #install.packages("DT")
+#install.packages("rlist")
+#install.packages("pipeR")
+#install.packages("tm")
+#install.packages("tidyr")
 ```
 
 ```{r}
@@ -25,12 +29,20 @@ library(tidyverse)
 library(rvest)
 library(xml2)
 library(stringr)
+library(plyr)
 library(dplyr)
-
+library(tidyr)
 library(DT)
 library("tibble")
 library(data.table)
-library(plyr)
+
+library(rlist)
+library(pipeR)
+library(tm)
+library(broom)
+
+
+
 ```
 
 
@@ -431,7 +443,7 @@ hard_skills_count_df_final
 ```
 
 
-#### Analysis 1b -- Top Data Science Soft Skills
+#### Analysis 1b -- Top Data Science Soft Skills by location
 
 ```{r Analysis-1b-Soft-Skills-by-geo-location}
 str(data)
@@ -476,7 +488,79 @@ str(data.table2)
 
 plyr::count(data2, strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), city_state )
 summarise_at(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ","), )
+
+
+data2 %>% group_by("city_state") %>% count(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','))
+
+data2 %>% group_by("city_state") %>% mutate( counts=n(), lists=list(strsplit(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) )
+
+# method 1 using dplyr
+data2 %>% group_by(city_state) %>% count(soft_skill_groupings_2, city_state) %>% {table(.$soft_skill_groupings_2)}
+
+# method 2 using count functions
+
+ count(data2, soft_skill_groupings_2, city_state ) %>% count(soft_skill_groupings_2)
+ 
+ # method 3 using group_by and count
+ data2 %>% group_by(city_state) %>% count(soft_skill_groupings_2) %>% group_by(city_state, soft_skill_groupings_2) %>% count()
+ 
+ 
+ data2 %>% group_by(city_state) %>% as.data.frame( table(strsplit(paste(stringi::stri_remove_empty(soft_skill_groupings_2, na_empty = T), collapse = ','), ",")) )%>%  head (1) group_by(city_state, soft_skill_groupings_2) %>% count()
+ 
+ 
+ data2 %>% group_by(city_state) %>%  mutate ( lists=as.character(count(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ',')))) %>% group_by(city_state, soft_skill_groupings_2) %>% count()
+
+as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq))
+# 1             New York NY   59
+# 2          Los Angeles CA   41
+# 3        San Francisco CA   40
+# 4              Chicago IL   30
+# 5            San Diego CA   30
+# 6               Boston MA   29
+# 7           Washington DC   28
+# 8          Santa Clara CA   16
+# 9               Denver CO   13
+# 10             Seattle WA   13
+
 ```
+
+
+```{r new-approach}
+# Trying to divide the corpus by cities
+
+ny <- data2[data2$city_state == "New York NY", 1]
+la <- data2[data2$city_state == "Los Angeles CA", 1] 
+sf <- data2[data2$city_state == "San Francisco CA", 1] 
+chi <- data2[data2$city_state == "Chicago IL", 1] 
+sd <- data2[data2$city_state == "San Diego CA", 1] 
+bos <- data2[data2$city_state == "Boston MA", 1] 
+wdc <- data2[data2$city_state == "Washington DC", 1] 
+sc <- data2[data2$city_state == "Santa Clara CA", 1]
+den <- data2[data2$city_state == "Denver CO", 1 ] 
+sea <- data2[data2$city_state == "Seattle WA", 1]
+
+cities <- c(ny, la, sf, chi, sd, bos, wdc, sc, den, sea)
+
+corpus.city <- VCorpus(VectorSource(cities))
+#list("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")
+tdm.city <- TermDocumentMatrix(corpus.city, control = control_list)
+
+
+# Make city dataframe
+
+
+df_city <- tidy(tdm.city)
+data2$soft_skill_groupings_3 <- mapvalues(data2.city,
+                                          from = 1:10,
+                                          to = c("NY", "LA", "SF",
+                                                 "CHI", "SD", "BOS",
+                                                 "WDC", "SC", "DEN", "SEA"
+                                                )
+                                         )
+
+
+```
+
 
 
 
