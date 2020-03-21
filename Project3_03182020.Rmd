@@ -527,6 +527,11 @@ as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq))
 
 
 ```{r new-approach}
+
+# Control list to be used for all corpuses
+control_list <- list(removePunctuation = TRUE, stopwords = TRUE, tolower = TRUE,
+                     weighting = weightTfIdf)
+
 # Trying to divide the corpus by cities
 
 ny <- data2[data2$city_state == "New York NY", 3]
