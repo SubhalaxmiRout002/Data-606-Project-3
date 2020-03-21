@@ -13,17 +13,17 @@ rm(list = ls(all.names = TRUE))
 ```
 
 ```{r}
-#install.packages("rvest")
-#install.packages("xml2")
-#install.packages("tidyverse")
-#install.packages("stringr")
-#install.packages("dplyr")
-#install.packages("DT")
-#install.packages("rlist")
-#install.packages("pipeR")
-#install.packages("tm")
-#install.packages("tidyr")
-#install.packages("tidytext")
+# install.packages("rvest")
+# install.packages("xml2")
+# install.packages("tidyverse")
+# install.packages("stringr")
+# install.packages("dplyr")
+# install.packages("DT")
+# install.packages("rlist")
+# install.packages("pipeR")
+# install.packages("tm")
+# install.packages("tidyr")
+# install.packages("tidytext")
 ```
 
 ```{r}
@@ -290,22 +290,24 @@ HS13 <- tolower(c("Jenkins CI/CD", "Git", "Github"))
 HS14 <- tolower(c("Azure", "Cloud data", "AWS", "Sagemaker"))
 HS15 <- tolower(c("agile"))
 
-data$hard_skill_groupings <- qdap::multigsub(HS1, "Data Modeling and DB Systems", data$hard_skills_2) 
-data$hard_skill_groupings <- qdap::multigsub(HS2, "Business Intelligence", data$hard_skill_groupings)
+data$hard_skill_groupings <- qdap::multigsub(HS1, "DataModeling&DbSystems", data$hard_skills_2) 
+data$hard_skill_groupings <- qdap::multigsub(HS2, "BusinessIntelligence", data$hard_skill_groupings)
 data$hard_skill_groupings <- qdap::multigsub(HS3, "API", data$hard_skill_groupings)
-data$hard_skill_groupings <- qdap::multigsub(HS4, "Business Understanding", data$hard_skill_groupings)
-data$hard_skill_groupings <- qdap::multigsub(HS5, "Statistics and Advanced Data Mining", data$hard_skill_groupings)
+data$hard_skill_groupings <- qdap::multigsub(HS4, "BusinessUnderstanding", data$hard_skill_groupings)
+data$hard_skill_groupings <- qdap::multigsub(HS5, "Statistics&AdvancedDataMining", data$hard_skill_groupings)
 data$hard_skill_groupings <- qdap::multigsub(HS6, "AI/ML", data$hard_skill_groupings)
-data$hard_skill_groupings <- qdap::multigsub(HS7, "Scripting Languages", data$hard_skill_groupings)
-data$hard_skill_groupings <- qdap::multigsub(HS8, "Business Analytics & Reporting", data$hard_skill_groupings)
+data$hard_skill_groupings <- qdap::multigsub(HS7, "ScriptingLanguages", data$hard_skill_groupings)
+data$hard_skill_groupings <- qdap::multigsub(HS8, "BusinessAnalytics&Reporting", data$hard_skill_groupings)
 data$hard_skill_groupings <- qdap::multigsub(HS9, "Algorithms", data$hard_skill_groupings)
 data$hard_skill_groupings <- qdap::multigsub(HS10, "Visualizations", data$hard_skill_groupings)
-data$hard_skill_groupings <- qdap::multigsub(HS11, "Product Analytics", data$hard_skill_groupings)
-data$hard_skill_groupings <- qdap::multigsub(HS12, "Web Analytics", data$hard_skill_groupings)
-data$hard_skill_groupings <- qdap::multigsub(HS13, "Opensource Management Systems & Automations", data$hard_skill_groupings)
-data$hard_skill_groupings <- qdap::multigsub(HS14, "Cloud Computing", data$hard_skill_groupings)
+data$hard_skill_groupings <- qdap::multigsub(HS11, "ProductAnalytics", data$hard_skill_groupings)
+data$hard_skill_groupings <- qdap::multigsub(HS12, "WebAnalytics", data$hard_skill_groupings)
+data$hard_skill_groupings <- qdap::multigsub(HS13, "OpensourceManagementSystems&Automations", data$hard_skill_groupings)
+data$hard_skill_groupings <- qdap::multigsub(HS14, "CloudComputing", data$hard_skill_groupings)
 data$hard_skill_groupings <- qdap::multigsub(HS15, "Agile", data$hard_skill_groupings)
 
+
+hard_skill_levels <- c("DataModeling&DbSystems", "BusinessIntelligence", "API", "BusinessUnderstanding", "Statistics&AdvancedDataMining", "AI/ML", "ScriptingLanguages", "BusinessAnalytics&Reporting", "Algorithms", "Visualizations", "ProductAnalytics", "WebAnalytics", "OpensourceManagementSystems&Automations", "CloudComputing", "Agile" )
 
 # checking hard_skills_2 vs hard_skill_groupings 
 data %>% select  (one_of(c("hard_skills_2", "hard_skill_groupings"))) %>% head(4)
@@ -338,6 +340,9 @@ data$soft_skill_groupings <- qdap::multigsub(SS5, "InterpersonalSkills", data$so
 data$soft_skill_groupings <- qdap::multigsub(SS6, "TimeManagement", data$soft_skill_groupings) 
 data$soft_skill_groupings <- qdap::multigsub(SS7, "Leadership", data$soft_skill_groupings) 
 data$soft_skill_groupings <- qdap::multigsub(SS8, "CommunicationSkills", data$soft_skill_groupings) 
+
+
+Soft_skills_levels <- c("Teamwork", "ProblemSolving", "Creativity", "WorkEthic", "InterpersonalSkills", "TimeManagement", "Leadership", "CommunicationSkills")
 
 # checking soft_skills_2 vs soft_skill_groupings 
 data %>% select  (one_of(c("soft_skills_2", "soft_skill_groupings"))) %>% head(4)
@@ -457,6 +462,11 @@ hard_skills_count_df_final
   ) +
   coord_flip()
 ```
+```{r reloading-data}
+
+data <- read.csv("https://raw.githubusercontent.com/SubhalaxmiRout002/Data-607-Project-3/master/data.csv", stringsAsFactors = FALSE)
+
+```
 
 ```{r data1-creation}
 data1 <- data
@@ -556,13 +566,12 @@ head(as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq)),10)
 ```
 
 ##### TF-IDF stnads for term frequency-inverse document frequency
-```{r new-approach}
-library(tm)
+```{r new-approach-1b.1}
+#library(tm)
 # Control list to be used for all corpuses
 # control_list <- list( tolower = F)
 
-control_list <- list(removePunctuation = TRUE, stopwords = TRUE, tolower = TRUE,
-                     weighting = weightTfIdf)
+control_list <- list(weighting = weightTfIdf)
 
 # Trying to divide the corpus by cities
 
@@ -612,9 +621,11 @@ df_city$document <- mapvalues(df_city$document,
 
 
 
+showgraph <- function(i) {
 df_city %>%
   arrange(desc(count)) %>%
-  mutate(word = factor(term, levels = rev(unique(term)) ),
+  # mutate(word = factor(term, levels = rev(unique(term)) ),
+  mutate(word = factor(Soft_skills_levels[[i]], levels = Soft_skills_levels[[i]] ),
            city = factor(document, levels = c("NY", "LA", "SF",
                                                  "CHI", "SD", "BOS",
                                                  "WDC", "SC", "DEN", "SEA"
@@ -626,17 +637,121 @@ df_city %>%
   ungroup() %>%
   ggplot(aes(word, count, fill = document)) +
   geom_bar(stat = "identity", alpha = 0.8, show.legend = FALSE) +
-  labs(title = "Highest Data Science Soft Skills by City",
+  labs(title = "Top Data Science Soft Skills by City",
        x = "Soft Skills Groupings", y = "TF-IDF") +
   facet_wrap(~city, ncol = 2, scales = "free_y") +
   coord_flip()
 
-
+}
+showgraph(1)
+showgraph(2)
+showgraph(3)
+showgraph(4)
+showgraph(5)
+showgraph(6)
+showgraph(7)
+showgraph(8)
 
 ```
 
 
+#### Analysis 1b -- Top Data Science Hard Skills by location
 
+```{r new-approach-1b.2}
+#library(tm)
+# Control list to be used for all corpuses
+# control_list <- list( tolower = F)
+
+control_list <- list(weighting = weightTfIdf)
+
+# Trying to divide the corpus by cities
+
+ny <- data2[data2$city_state == "New York NY", 2]
+la <- data2[data2$city_state == "Los Angeles CA", 2] 
+sf <- data2[data2$city_state == "San Francisco CA", 2] 
+chi <- data2[data2$city_state == "Chicago IL", 2] 
+sd <- data2[data2$city_state == "San Diego CA", 2] 
+bos <- data2[data2$city_state == "Boston MA", 2] 
+wdc <- data2[data2$city_state == "Washington DC", 2] 
+sc <- data2[data2$city_state == "Santa Clara CA", 2]
+den <- data2[data2$city_state == "Denver CO", 2 ] 
+sea <- data2[data2$city_state == "Seattle WA", 2]
+
+cities <- c(ny, la, sf, chi, sd, bos, wdc, sc, den, sea)
+
+
+
+
+
+corpus.city <- VCorpus(VectorSource(cities))
+#list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills"))
+
+
+
+tdm.city <- DocumentTermMatrix(corpus.city , control = control_list)
+                                # list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")))
+#list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")))
+
+
+
+# Make city dataframe
+
+
+df_city <- tidy(tdm.city)
+
+df_city
+
+df_city$document <- mapvalues(df_city$document,
+                                          from = 1:10,
+                                          to = c("NY", "LA", "SF",
+                                                 "CHI", "SD", "BOS",
+                                                 "WDC", "SC", "DEN", "SEA"
+                                                )
+                             )
+
+
+
+
+showgraph2 <- function(i) {
+df_city %>%
+  arrange(desc(count)) %>%
+  mutate(word = factor(hard_skill_levels[[i]], levels = hard_skill_levels[[i]] ),
+           city = factor(document, levels = c("NY", "LA", "SF",
+                                                 "CHI", "SD", "BOS",
+                                                 "WDC", "SC", "DEN", "SEA"
+                                             )
+                        )
+        ) %>%
+  group_by(document) %>%
+  top_n(3, wt = count) %>%
+  ungroup() %>%
+  ggplot(aes(word, count, fill = document)) +
+  geom_bar(stat = "identity", alpha = 0.8, show.legend = FALSE) +
+  labs(title = "Highest Data Science Hard Skills by City",
+       x = "Hard Skills Groupings", y = "TF-IDF") +
+  facet_wrap(~city, ncol = 2, scales = "free_y") +
+  coord_flip()
+}
+
+showgraph2(1)
+showgraph2(2)
+showgraph2(3)
+showgraph2(4)
+showgraph2(5)
+showgraph2(6)
+showgraph2(7)
+showgraph2(8)
+showgraph2(9)
+showgraph2(10)
+showgraph2(11)
+showgraph2(12)
+showgraph2(13)
+showgraph2(14)
+showgraph2(15)
+
+
+
+```
 
 ```{r}
 #Create .csv file
