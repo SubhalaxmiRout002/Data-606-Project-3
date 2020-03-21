@@ -317,11 +317,11 @@ SS8 <- tolower(c("communicate", "communication skills"))
 data$soft_skill_groupings <- qdap::multigsub(SS1, "Teamwork", data$soft_skills_2) 
 data$soft_skill_groupings <- qdap::multigsub(SS2, "Problem-Solving", data$soft_skill_groupings) 
 data$soft_skill_groupings <- qdap::multigsub(SS3, "Creativity", data$soft_skill_groupings) 
-data$soft_skill_groupings <- qdap::multigsub(SS4, "Work Ethic", data$soft_skill_groupings) 
-data$soft_skill_groupings <- qdap::multigsub(SS5, "Interpersonal Skills", data$soft_skill_groupings) 
-data$soft_skill_groupings <- qdap::multigsub(SS6, "Time Management", data$soft_skill_groupings) 
+data$soft_skill_groupings <- qdap::multigsub(SS4, "Work-Ethic", data$soft_skill_groupings) 
+data$soft_skill_groupings <- qdap::multigsub(SS5, "Interpersonal-Skills", data$soft_skill_groupings) 
+data$soft_skill_groupings <- qdap::multigsub(SS6, "Time-Management", data$soft_skill_groupings) 
 data$soft_skill_groupings <- qdap::multigsub(SS7, "Leadership", data$soft_skill_groupings) 
-data$soft_skill_groupings <- qdap::multigsub(SS8, "Communication Skills", data$soft_skill_groupings) 
+data$soft_skill_groupings <- qdap::multigsub(SS8, "Communication-Skills", data$soft_skill_groupings) 
 
 # checking soft_skills_2 vs soft_skill_groupings 
 data %>% select  (one_of(c("soft_skills_2", "soft_skill_groupings"))) %>% head(4)
@@ -443,6 +443,23 @@ hard_skills_count_df_final
   coord_flip()
 ```
 
+```{r data1-creation}
+data1 <- data
+# create city_state
+data1$city_state <- paste(data$location, sep = " ", data$state)
+
+```
+
+
+
+```{r data2-creation}
+
+data2 <- data1 %>% select (city_state, hard_skill_groupings_2, soft_skill_groupings_2)
+head(data2, 4)
+
+unique(data2$city_state)
+```
+
 
 #### Analysis 1b -- Top Data Science Soft Skills by location
 
@@ -451,9 +468,7 @@ hard_skills_count_df_final
 # head(data[,c("location","state" )] )
 # 
 # #  paste(data$location, sep = " ", data$state)
-# data1 <- data
-# data1$city_state <- paste(data$location, sep = " ", data$state) 
-# # %>%group_by( paste(location, sep = " ", state)) 
+
 # 
 # data2 <- data1 %>% select (city_state, hard_skill_groupings_2, soft_skill_groupings_2) %>% group_by (city_state) 
 # # data1 #%>% select(city_state, hard_skill_groupings_2) %>% 
@@ -525,12 +540,11 @@ as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq))
 
 ```
 
-
+##### TF-IDF stnads for term frequency-inverse document frequency
 ```{r new-approach}
 
 # Control list to be used for all corpuses
-control_list <- list(removePunctuation = TRUE, stopwords = TRUE, tolower = TRUE,
-                     weighting = weightTfIdf)
+control_list <- list( tolower = TRUE)
 
 # Trying to divide the corpus by cities
 
@@ -547,9 +561,19 @@ sea <- data2[data2$city_state == "Seattle WA", 3]
 
 cities <- c(ny, la, sf, chi, sd, bos, wdc, sc, den, sea)
 
+
+
+
+
 corpus.city <- VCorpus(VectorSource(cities))
-#list("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")
-tdm.city <- DocumentTermMatrix(corpus.city, control = control_list)
+#list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills"))
+
+
+
+tdm.city <- DocumentTermMatrix(corpus.city , control = control_list)
+                                # list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")))
+#list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")))
+
 
 
 # Make city dataframe
@@ -565,8 +589,29 @@ df_city$document <- mapvalues(df_city$document,
                                                  "CHI", "SD", "BOS",
                                                  "WDC", "SC", "DEN", "SEA"
                                                 )
-                                         )
+                             )
 
+
+
+
+df_city %>%
+  arrange(desc(count)) %>%
+  mutate(word = factor(term, levels = rev(unique(term)) ),
+           city = factor(document, levels = c("NY", "LA", "SF",
+                                                 "CHI", "SD", "BOS",
+                                                 "WDC", "SC", "DEN", "SEA"
+                                             )
+                        )
+        ) %>%
+  group_by(document) %>%
+  top_n(8, wt = count) %>%
+  ungroup() %>%
+  ggplot(aes(word, count, fill = document)) +
+  geom_bar(stat = "identity", alpha = 0.8, show.legend = FALSE) +
+  labs(title = "Highest Data Science Soft Skills by City",
+       x = "Soft Skills Groupings", y = "TF-IDF") +
+  facet_wrap(~city, ncol = 2, scales = "free_y") +
+  coord_flip()
 
 ```
 
