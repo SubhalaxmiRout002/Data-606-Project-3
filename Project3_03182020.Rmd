@@ -315,13 +315,13 @@ SS7 <- tolower(c("decision-making"))
 SS8 <- tolower(c("communicate", "communication skills"))
 
 data$soft_skill_groupings <- qdap::multigsub(SS1, "Teamwork", data$soft_skills_2) 
-data$soft_skill_groupings <- qdap::multigsub(SS2, "Problem-Solving", data$soft_skill_groupings) 
+data$soft_skill_groupings <- qdap::multigsub(SS2, "ProblemSolving", data$soft_skill_groupings) 
 data$soft_skill_groupings <- qdap::multigsub(SS3, "Creativity", data$soft_skill_groupings) 
-data$soft_skill_groupings <- qdap::multigsub(SS4, "Work-Ethic", data$soft_skill_groupings) 
-data$soft_skill_groupings <- qdap::multigsub(SS5, "Interpersonal-Skills", data$soft_skill_groupings) 
-data$soft_skill_groupings <- qdap::multigsub(SS6, "Time-Management", data$soft_skill_groupings) 
+data$soft_skill_groupings <- qdap::multigsub(SS4, "WorkEthic", data$soft_skill_groupings) 
+data$soft_skill_groupings <- qdap::multigsub(SS5, "InterpersonalSkills", data$soft_skill_groupings) 
+data$soft_skill_groupings <- qdap::multigsub(SS6, "TimeManagement", data$soft_skill_groupings) 
 data$soft_skill_groupings <- qdap::multigsub(SS7, "Leadership", data$soft_skill_groupings) 
-data$soft_skill_groupings <- qdap::multigsub(SS8, "Communication-Skills", data$soft_skill_groupings) 
+data$soft_skill_groupings <- qdap::multigsub(SS8, "CommunicationSkills", data$soft_skill_groupings) 
 
 # checking soft_skills_2 vs soft_skill_groupings 
 data %>% select  (one_of(c("soft_skills_2", "soft_skill_groupings"))) %>% head(4)
@@ -457,7 +457,7 @@ data1$city_state <- paste(data$location, sep = " ", data$state)
 data2 <- data1 %>% select (city_state, hard_skill_groupings_2, soft_skill_groupings_2)
 head(data2, 4)
 
-unique(data2$city_state)
+# unique(data2$city_state)
 ```
 
 
@@ -526,7 +526,7 @@ unique(data2$city_state)
 #  
 #  data2 %>% group_by(city_state) %>%  mutate ( lists=as.character(count(paste(stringi::stri_remove_empty(data2$soft_skill_groupings_2, na_empty = T), collapse = ',')))) %>% group_by(city_state, soft_skill_groupings_2) %>% count()
 
-as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq))
+head(as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq)),10)
 # 1             New York NY   59
 # 2          Los Angeles CA   41
 # 3        San Francisco CA   40
@@ -544,7 +544,7 @@ as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq))
 ```{r new-approach}
 
 # Control list to be used for all corpuses
-control_list <- list( tolower = TRUE)
+control_list <- list( tolower = F)
 
 # Trying to divide the corpus by cities
 
@@ -604,7 +604,7 @@ df_city %>%
                         )
         ) %>%
   group_by(document) %>%
-  top_n(8, wt = count) %>%
+  top_n(3, wt = count) %>%
   ungroup() %>%
   ggplot(aes(word, count, fill = document)) +
   geom_bar(stat = "identity", alpha = 0.8, show.legend = FALSE) +
