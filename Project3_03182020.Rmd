@@ -24,40 +24,28 @@ rm(list = ls(all.names = TRUE))
 # install.packages("tm")
 # install.packages("tidyr")
 # install.packages("tidytext")
+# install.packages("plyr")
+# install.packages("broom")
 ```
 
 ```{r}
-# library(plyr)
-# library(tidyverse)
-# library(rvest)
-# library(xml2)
-# library(stringr)
-# 
-# library(dplyr)
-# library(tidyr)
-# library(DT)
-# library("tibble")
-# library(data.table)
-# 
-# library(rlist)
-# library(pipeR)
-# library(tm)
-# library(broom)
-# library(tidytext)
+
 
 library(rvest)
+library(xml2)
+library(stringr)
 library(plyr)
 library(dplyr)
-library(stringr)
 library(tidyr)
-library(ggplot2)
-library(tm)
-library(tidytext)
-library(rJava)
+library(DT)
+library("tibble")
+library(data.table)
+library(rlist)
+library(pipeR)
 library(tm)
 library(broom)
-library(scales) 
-
+library(tidytext)
+library(ggplot2)
 
 ```
 
@@ -564,7 +552,8 @@ head(as.data.frame(table(data2$city_state)) %>% arrange(desc(Freq)),10)
 
 ##### TF-IDF stnads for term frequency-inverse document frequency
 ```{r new-approach-1b.1}
-#library(tm)
+# library(qdap)
+
 # Control list to be used for all corpuses
 # control_list <- list( tolower = F)
 
@@ -594,7 +583,7 @@ corpus.city <- VCorpus(VectorSource(cities))
 
 
 
-tdm.city <- DocumentTermMatrix(corpus.city , control = control_list)
+tdm.city <- TermDocumentMatrix(corpus.city , control = control_list)
                                 # list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")))
 #list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")))
 
@@ -655,7 +644,23 @@ showgraph(8)
 #### Analysis 1b -- Top Data Science Hard Skills by location
 
 ```{r new-approach-1b.2}
-#library(tm)
+library(rvest)
+library(xml2)
+library(stringr)
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(DT)
+library("tibble")
+library(data.table)
+library(rlist)
+library(pipeR)
+library(tm)
+library(broom)
+library(tidytext)
+library(ggplot2)
+
+
 # Control list to be used for all corpuses
 # control_list <- list( tolower = F)
 
@@ -680,12 +685,12 @@ cities <- c(ny, la, sf, chi, sd, bos, wdc, sc, den, sea)
 
 
 
-corpus.city <- VCorpus(VectorSource(cities))
+corpus.city <- tm::VCorpus(VectorSource(cities))
 #list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills"))
 
 
 
-tdm.city <- DocumentTermMatrix(corpus.city , control = control_list)
+tdm.city <- tm::DocumentTermMatrix(corpus.city , control = control_list)
                                 # list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")))
 #list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills")))
 
@@ -698,7 +703,7 @@ df_city <- tidy(tdm.city)
 
 df_city
 
-df_city$document <- mapvalues(df_city$document,
+df_city$document <- plyr::mapvalues(df_city$document,
                                           from = 1:10,
                                           to = c("NY", "LA", "SF",
                                                  "CHI", "SD", "BOS",
