@@ -3,8 +3,8 @@ title: "Project 3 ver2"
 author: "Subhalaxmi Rout"
 date: "3/11/2020"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -352,6 +352,10 @@ data %>% select  (one_of(c("soft_skills_2", "soft_skill_groupings_2"))) %>% head
   
 #count(unique(strsplit(data$soft_skill_groupings, ",")), "group")
 
+length(unique(unlist(strsplit(data$soft_skills_2, ","))))
+
+length(unique(unlist(strsplit(data$hard_skills_2, ","))))
+
 #hist(table(data$soft_skill_groupings_2), freq = FALSE, ylim = c(0, 2))
 
 # , dnn=c("Teamwork", "Problem-Solving", "Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Leadership", "Communication Skills")
@@ -399,7 +403,7 @@ soft_skills_count_df_final
 
 ```
 
-```{r fig.width=13, fig.height= 4}
+```{r fig.width=8, fig.height= 4}
   ggplot(data = soft_skills_count_df_final) +
   aes(x = reorder(Var1, Frequency_Percent), y = Frequency_Percent) +
   geom_bar(stat = "identity") +
@@ -434,7 +438,7 @@ hard_skills_count_df_final1 <- hard_skills_count_df_final %>% filter (!(Var1  ==
 
 ```
 
-```{r fig.width=13, fig.height= 4}
+```{r fig.width=8, fig.height= 4}
   ggplot(data = hard_skills_count_df_final1) +
   aes(x = reorder(Var1, Frequency_Percent), y = Frequency_Percent) +
   geom_bar(stat = "identity") +
@@ -451,6 +455,24 @@ hard_skills_count_df_final1 <- hard_skills_count_df_final %>% filter (!(Var1  ==
   ) +
   coord_flip()
 ```
+
+
+### A. What are the most valued data science skills?
+
+####Most in-demand
+
+* Hard skills: 
+    + AL/ML and Algorithms - AI, NLP/ML, Tensorflow
+    + Business Analytics & Reporting - analytic solutions, analysis, Reporting
+    + Scripting Languages - SQL, Python, Hive
+    + Statistics and Advanced Data Mining - predictive modeling, Decision Tree/Random Forest, K-means clustering, Regression
+
+* Soft skills: 
+    + Communication Skills - communicate well, excellent communication skills.
+
+The list of most in-demand skills is consistent with the functional application of the service and work of a typical data scientist provides. The list also tends to be very practical on-hands programming and technological appliations that resonate with the public image in the society. For example, Statistics and Advanced Data Mining entails Regression, Decision Tree/Random Forests as well as K-means clustering analysis. At the end of the day, the ability bring the research capability with data science or data-related products are keys to the success of businesses of any sizes. So it's not hard to fathom these types of skills intersect with the functional areas of a typical data scientist and business applications. 
+
+While there are many free online MOOCs available in the marketplace like Coursera, Udemy, datacamp, and codecademy, there are an implicit demand for data scientists who demonstrated a track record of multi-year success in the space. One thing that needs to be pointed out is that there is a demonstrated proliferation of demands (as compared to a relative obscurity in the past) that is observed in the Open Source Management Systems & Automations like github or CRAN exemplifies the appetite for employers to look for builders and collaborators who has a thirst for code-sharing and real-time code collaborations and expertise in  github and git. 
 
 
 ```{r data1-creation}
