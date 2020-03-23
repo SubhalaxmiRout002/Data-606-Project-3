@@ -295,7 +295,7 @@ data$hard_skill_groupings <- qdap::multigsub(HS14, "Agile", data$hard_skill_grou
 hard_skill_levels <- c("DataModeling&DbSystems", "BusinessIntelligence", "API", "BusinessUnderstanding", "Statistics&AdvancedDataMining", "AI/ML&Algorithms", "ScriptingLanguages", "BusinessAnalytics&Reporting", "Visualizations", "ProductAnalytics", "WebAnalytics", "OSMS&Automations", "CloudComputing", "Agile" )
 
 # checking hard_skills_2 vs hard_skill_groupings 
-data %>% select  (one_of(c("hard_skills_2", "hard_skill_groupings"))) %>% head(4)
+data %>% dplyr::select  (one_of(c("hard_skills_2", "hard_skill_groupings"))) %>% head(4)
 
 data$hard_skill_groupings_2 <- sapply (strsplit(data$hard_skill_groupings, ","), function(x) paste(unique(x), collapse = ",") )
 
@@ -330,7 +330,7 @@ data$soft_skill_groupings <- qdap::multigsub(SS8, "CommunicationSkills", data$so
 Soft_skills_levels <- c("Teamwork", "ProblemSolving", "IntellectualCuriosity", "WorkEthic", "InterpersonalSkills", "TimeManagement", "Leadership", "CommunicationSkills")
 
 # checking soft_skills_2 vs soft_skill_groupings 
-data %>% select  (one_of(c("soft_skills_2", "soft_skill_groupings"))) %>% head(4)
+data %>% dplyr::select  (one_of(c("soft_skills_2", "soft_skill_groupings"))) %>% head(4)
 
 data$soft_skill_groupings_2 <- sapply (strsplit(data$soft_skill_groupings, ","), function(x) paste(unique(x), collapse = ",") )
 
@@ -468,11 +468,12 @@ hard_skills_count_df_final1 <- hard_skills_count_df_final %>% filter (!(Var1  ==
     + Statistics and Advanced Data Mining - predictive modeling, Decision Tree/Random Forest, K-means clustering, Regression
 
 * Soft skills: 
-    + Communication Skills - communicate well, excellent communication skills.
+    + Communication Skills - communicate well, excellent communication skills.  
+
 
 The list of most in-demand skills is consistent with the functional application of the service and work of a typical data scientist provides. The list also tends to be very practical hands-on programming and technological appliations that resonate with the public image perceived in the society. For example, Statistics and Advanced Data Mining entails Regression, Decision Tree/Random Forests as well as K-means clustering analysis. At the end of the day, the ability to bring the research capability with data science or data-related products are keys to the success of businesses of any sizes. So it's not hard to fathom these types of skills intersect with the functional areas of a typical data scientist and business applications. 
 
-While there are many free online MOOCs available in the marketplace like Coursera, Udemy, datacamp, and codecademy, there are an implicit demand for data scientists who demonstrated a track record of multi-year success in the space. One thing that needs to be pointed out is that there is a demonstrated proliferation of demands (as compared to a relative obscurity in the past) that is observed in the Open Source Management Systems & Automations like github or CRAN exemplifies the appetite for employers to look for builders and collaborators who has a thirst for code-sharing and real-time code collaborations and expertise in github and git in any scientific / engineering effort.
+While there are many free online MOOCs available in the marketplace like Coursera, Udemy, datacamp, and codecademy, there are an implicit demand for data scientists who demonstrated a track record of multi-year success in the space. One thing that needs to be pointed out is that there is a demonstrated proliferation of demands (as compared to a relative obscurity in the past) that is observed in the Open Source Management Systems & Automations like github or CRAN exemplifies the appetite for employers to look for builders and collaborators who has a thirst for code-sharing and real-time code collaborations and expertise in github and git for any scientific / engineering projects.  
 
 
 ```{r data1-creation}
@@ -486,7 +487,7 @@ data1$city_state <- paste(data$location, sep = " ", data$state)
 
 ```{r data2-creation}
 
-data2 <- data1 %>% select (city_state, hard_skill_groupings_2, soft_skill_groupings_2)
+data2 <- data1 %>% dplyr::select (city_state, hard_skill_groupings_2, soft_skill_groupings_2)
 head(data2, 4)
 
 # unique(data2$city_state)
@@ -666,22 +667,8 @@ showgraph(8)
 #### Analysis 1b -- Top Data Science Hard Skills by location
 
 ```{r new-approach-1b.2}
-library(rvest)
-library(xml2)
-library(stringr)
-library(plyr)
-library(dplyr)
-library(tidyr)
-library(DT)
-library("tibble")
-library(data.table)
-library(rlist)
-library(pipeR)
-library(tm)
-library(broom)
-library(tidytext)
-library(ggplot2)
 
+rm(list = ls(all = TRUE))
 
 # Control list to be used for all corpuses
 # control_list <- list( tolower = F)
@@ -707,7 +694,7 @@ cities <- c(ny, la, sf, chi, sd, bos, wdc, sc, den, sea)
 
 
 
-corpus.city <- tm::VCorpus(VectorSource(cities))
+corpus.city <- tm::VCorpus(tm::VectorSource(cities))
 #list(c("Teamwork", "Problem-Solving","Creativity", "Work Ethic", "Interpersonal Skills", "Time Management", "Leadership", "Communication Skills"))
 
 
@@ -721,7 +708,7 @@ tdm.city <- tm::DocumentTermMatrix(corpus.city , control = control_list)
 # Make city dataframe
 
 
-df_city <- tidy(tdm.city)
+df_city <- broom::tidy(tdm.city)
 
 df_city
 
@@ -751,7 +738,7 @@ df_city %>%
   ungroup() %>%
   ggplot(aes(word, count, fill = document)) +
   geom_bar(stat = "identity", alpha = 0.8, show.legend = FALSE) +
-  labs(title = "Highest Data Science Hard Skills by City",
+  labs(title = "Top Data Science Hard Skills by City",
        x = "Hard Skills Groupings", y = "TF-IDF") +
   facet_wrap(~city, ncol = 2, scales = "free_y") +
   coord_flip()
